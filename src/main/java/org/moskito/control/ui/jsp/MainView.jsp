@@ -92,6 +92,7 @@
             </ul>
         </div>
     </ano:notEqual>
+    </ano:notEqual>
 </div>
 <div class="content">
     <ano:equal name="settingsToggle" value="true">
