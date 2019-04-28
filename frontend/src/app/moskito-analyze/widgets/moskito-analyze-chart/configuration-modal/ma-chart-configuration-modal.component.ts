@@ -49,21 +49,21 @@ export class MoskitoAnalyzeChartConfigurationModalComponent implements OnInit {
   chartForm: FormGroup;
 
   /**
-   * List of selected hosts.
+   * List of selected components.
    * Used for custom multi select component.
    */
-  selectedHosts: number[] = [];
+  selectedComponents: number[] = [];
 
   /**
-   * List of possible hosts that can be selected.
+   * List of possible components that can be selected.
    * Used for custom multi select component.
    */
-  availableHosts: IMultiSelectOption[];
+  availableComponents: IMultiSelectOption[];
 
   /**
    * Multi Select component settings.
    */
-  hostsSettings: IMultiSelectSettings;
+  componentsSettings: IMultiSelectSettings;
 
   /**
    * Producer tree, received from MoSKito-Analyze.
@@ -97,12 +97,12 @@ export class MoskitoAnalyzeChartConfigurationModalComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.availableHosts = [
-      { id: 1, name: 'DE1ANI3BURGR201' },
-      { id: 2, name: 'DE1ANI3BURGR302' }
+    this.availableComponents = [
+      { id: 1, name: 'munich' },
+      { id: 2, name: 'bedcon' }
     ];
 
-    this.hostsSettings = {
+    this.componentsSettings = {
       checkedStyle: 'fontawesome',
       buttonClasses: 'custom-dropdown-block',
       containerClasses: 'dropdown-block'
@@ -114,12 +114,12 @@ export class MoskitoAnalyzeChartConfigurationModalComponent implements OnInit {
       this.producerData = producers;
 
       this.producers = this.getProducerNames(this.producerData);
-      this.stats = this.getStatNames(this.chart ? this.chart.producer : '', this.producerData);
-      this.values = this.getValueNames(this.chart ? this.chart.producer : '', this.chart ? this.chart.stat : '', this.producerData);
+      //this.stats = this.getStatNames(this.chart ? this.chart.producer : '', this.producerData);
+      //this.values = this.getValueNames(this.chart ? this.chart.producer : '', this.chart ? this.chart.stat : '', this.producerData);
     });
 
     if (this.chart) {
-      this.selectedHosts = this.getHostIdsByNames(this.chart.hosts);
+      //this.selectedComponents = this.getHostIdsByNames(this.chart.components);
     }
 
     this.producerNameChange();
@@ -134,15 +134,13 @@ export class MoskitoAnalyzeChartConfigurationModalComponent implements OnInit {
 
     chart.id = this.chart.id;
     chart.name = this.chart.name ? this.chart.name : this.generateChartName();
-    chart.type = this.chartForm.value.type;
+    chart.caption = this.chartForm.value.caption;
+
+
+
     chart.interval = this.chartForm.value.interval;
-    chart.hosts = this.resolveHostsByIds(this.selectedHosts);
     chart.startDate = new Date(this.chartForm.value.startDate);
     chart.endDate = new Date(this.chartForm.value.endDate);
-    chart.caption = this.chartForm.value.caption;
-    chart.producer = this.chartForm.value.producer;
-    chart.stat = this.chartForm.value.stat;
-    chart.value = this.chartForm.value.value;
 
     // Fire chart updated or created action
     if (this.action === 'update')
@@ -267,36 +265,36 @@ export class MoskitoAnalyzeChartConfigurationModalComponent implements OnInit {
   }
 
   /**
-   * Returns list of host names by their indexes from array.
+   * Returns list of component names by their indexes from array.
    * @param ids
    * @returns {string[]}
    */
-  private resolveHostsByIds(ids: number[]): string[] {
-    let hosts: string[] = [];
+  private resolveComponentsByIds(ids: number[]): string[] {
+    let components: string[] = [];
 
     for (let id of ids) {
-      hosts.push(this.availableHosts[id - 1].name);
+      components.push(this.availableComponents[id - 1].name);
     }
 
-    return hosts;
+    return components;
   }
 
   /**
-   * Returns host indexes in array by given host names.
-   * @param hosts
+   * Returns components indexes in array by given host names.
+   * @param components
    */
-  private getHostIdsByNames(hosts: string[]) {
-    let hostNames = [];
+  private getHostIdsByNames(components: string[]) {
+    let componentNames = [];
 
-    for (let hostName of hosts) {
-      for (let hostItem of this.availableHosts) {
-        if (hostItem.name === hostName) {
-          hostNames.push(hostItem.id);
+    for (let componentName of components) {
+      for (let componentItem of this.availableComponents) {
+        if (componentItem.name === componentName) {
+          componentNames.push(componentItem.id);
         }
       }
     }
 
-    return hostNames;
+    return componentNames;
   }
 
   /**
@@ -304,7 +302,6 @@ export class MoskitoAnalyzeChartConfigurationModalComponent implements OnInit {
    */
   private buildChartForm() {
     this.chartForm = this.fb.group({
-      type: [ this.chart.type, [ Validators.required ] ],
       interval: [ this.chart.interval, [ Validators.required ] ],
 
       startDate: [
@@ -321,10 +318,7 @@ export class MoskitoAnalyzeChartConfigurationModalComponent implements OnInit {
         [ Validators.required ]
       ],
 
-      caption: [ this.chart.caption, [ Validators.required ] ],
-      producer: [ this.chart.producer, [ Validators.required ] ],
-      stat: [ this.chart.stat, [ Validators.required ] ],
-      value: [ this.chart.value, [ Validators.required ] ]
+      caption: [ this.chart.caption, [ Validators.required ] ]
     });
   }
 }

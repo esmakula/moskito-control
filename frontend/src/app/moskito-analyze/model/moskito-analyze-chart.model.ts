@@ -1,3 +1,5 @@
+import { MoskitoAnalyzeChartLine } from "./moskito-analyze-chart-line.model";
+
 /**
  * Contains MoSKito-Analyze chart properties.
  * @author strel
@@ -24,17 +26,7 @@ export class MoskitoAnalyzeChart {
    */
   interval: string;
 
-  /**
-   * Chart type, i.e. description of what actually chart is showing:
-   * average values, total values and so on.
-   */
-  type: string;
-
-  /**
-   * List of hosts used for chart data request.
-   * @type {Array}
-   */
-  hosts: string[] = [];
+  lines: MoskitoAnalyzeChartLine[];
 
   /**
    * Start date.
@@ -50,20 +42,5 @@ export class MoskitoAnalyzeChart {
    * Whether chart data is currently loading.
    */
   loading: boolean;
-
-  /**
-   * Producer name / id.
-   */
-  producer: string;
-
-  /**
-   * Stat name.
-   */
-  stat: string;
-
-  /**
-   * Value name.
-   */
-  value: string;
 
 }

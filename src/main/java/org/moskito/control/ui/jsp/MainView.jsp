@@ -64,17 +64,34 @@
                 </ul>
             </div>
 
-            <div class="block">
-                <h3 class="block-title">Statistics</h3>
-                <ul class="statistics-list">
-                    <li class="purple"><a href="#">${countByStatus.purple} <span class="status"></span></a></li>
-                    <li class="red"><a href="#">${countByStatus.red} <span class="status"></span></a></li>
-                    <li class="orange"><a href="#">${countByStatus.orange}<span class="status"></span></a></li>
-                    <li class="yellow"><a href="#">${countByStatus.yellow} <span class="status"></span></a></li>
-                    <li class="green"><a href="#">${countByStatus.green} <span class="status"></span></a></li>
-                </ul>
-            </div>
-        </ano:notEqual>
+        <div class="block">
+            <h3 class="block-title">
+                Statistics<a class="pull-right clear-filter-toggle" href="clearStatusFilter">clear</a>
+            </h3>
+            <ul class="statistics-list">
+                <li class="purple <ano:iF test="${countByStatus.purple.selected}">active</ano:iF>">
+                    <ano:iF test="${countByStatus.purple.selected}"><a href="removeStatusFilter?color=purple">${countByStatus.purple.componentCount} <span class="status"></span></a></ano:iF>
+                    <ano:iF test="${!countByStatus.purple.selected}"><a href="addStatusFilter?color=purple">${countByStatus.purple.componentCount} <span class="status"></span></a></ano:iF>
+                </li>
+                <li class="red <ano:iF test="${countByStatus.red.selected}">active</ano:iF>">
+                    <ano:iF test="${countByStatus.red.selected}"><a href="removeStatusFilter?color=red">${countByStatus.red.componentCount} <span class="status"></span></a></ano:iF>
+                    <ano:iF test="${!countByStatus.red.selected}"><a href="addStatusFilter?color=red">${countByStatus.red.componentCount} <span class="status"></span></a></ano:iF>
+                </li>
+                <li class="orange <ano:iF test="${countByStatus.orange.selected}">active</ano:iF>">
+                    <ano:iF test="${countByStatus.orange.selected}"><a href="removeStatusFilter?color=orange">${countByStatus.orange.componentCount} <span class="status"></span></a></ano:iF>
+                    <ano:iF test="${!countByStatus.orange.selected}"><a href="addStatusFilter?color=orange">${countByStatus.orange.componentCount} <span class="status"></span></a></ano:iF>
+                </li>
+                <li class="yellow <ano:iF test="${countByStatus.yellow.selected}">active</ano:iF>">
+                    <ano:iF test="${countByStatus.yellow.selected}"><a href="removeStatusFilter?color=yellow">${countByStatus.yellow.componentCount} <span class="status"></span></a></ano:iF>
+                    <ano:iF test="${!countByStatus.yellow.selected}"><a href="addStatusFilter?color=yellow">${countByStatus.yellow.componentCount} <span class="status"></span></a></ano:iF>
+                </li>
+                <li class="green <ano:iF test="${countByStatus.green.selected}">active</ano:iF>">
+                    <ano:iF test="${countByStatus.green.selected}"><a href="removeStatusFilter?color=green">${countByStatus.green.componentCount} <span class="status"></span></a></ano:iF>
+                    <ano:iF test="${!countByStatus.green.selected}"><a href="addStatusFilter?color=green">${countByStatus.green.componentCount} <span class="status"></span></a></ano:iF>
+                </li>
+            </ul>
+        </div>
+    </ano:notEqual>
     </ano:notEqual>
 </div>
 <div class="content">
@@ -277,6 +294,9 @@
 
                                         <li id="info-tab-toggle-<ano:write name="holderIndex"/><ano:write name="componentIndex"/>"><a href="#info-tab-<ano:write name="holderIndex"/><ano:write name="componentIndex"/>" data-toggle="tab"
                                                onclick="showConnectorInformation('${pageContext.request.contextPath}','<ano:write name="component" property="name"/>', <ano:write name="holderIndex"/>, <ano:write name="componentIndex"/>)">Connector Information</a></li>
+
+                                        <li id="history-tab-toggle-<ano:write name="holderIndex"/><ano:write name="componentIndex"/>"><a href="#history-tab-<ano:write name="holderIndex"/><ano:write name="componentIndex"/>" data-toggle="tab"
+                                               onclick="showHistory('${pageContext.request.contextPath}','<ano:write name="component" property="name"/>', <ano:write name="holderIndex"/>, <ano:write name="componentIndex"/>)">History</a></li>
                                     </ul>
                                 <%-- Thresholds & Accumulators tabs --%>
                                 </div>
@@ -307,6 +327,15 @@
                                             </div>
                                             <div id="info-view-<ano:write name="holderIndex"/><ano:write name="componentIndex"/>">
                                                 <%-- ajax content --%>
+                                            </div>
+                                        </div>
+
+                                        <div class="tab-pane" id="history-tab-<ano:write name="holderIndex"/><ano:write name="componentIndex"/>">
+                                            <div class="loading" style="display: none">
+                                                <span class="spinner"></span>
+                                            </div>
+                                            <div id="history-view-<ano:write name="holderIndex"/><ano:write name="componentIndex"/>">
+                                                    <%-- ajax content --%>
                                             </div>
                                         </div>
                                     </div>
@@ -371,6 +400,10 @@
                                                     <a href="#info-tab-<ano:write name="componentIndex"/>" data-toggle="tab"
                                                        onclick="showConnectorInformation('${pageContext.request.contextPath}','<ano:write name="component" property="name"/>', '', <ano:write name="componentIndex"/>)">Connector Information</a>
                                                 </li>
+                                                <li>
+                                                    <a href="#history-tab-<ano:write name="componentIndex"/>" data-toggle="tab"
+                                                       onclick="showHistory('${pageContext.request.contextPath}','<ano:write name="component" property="name"/>', '', <ano:write name="componentIndex"/>)">History</a>
+                                                </li>
                                             </ul>
                                                 <%-- Thresholds & Accumulators tabs --%>
                                         </div>
@@ -403,6 +436,15 @@
                                                             <%-- ajax content --%>
                                                         </div>
                                                     </div>
+
+                                                <div class="tab-pane" id="history-tab-<ano:write name="componentIndex"/>">
+                                                    <div class="loading" style="display: none">
+                                                        <span class="spinner"></span>
+                                                    </div>
+                                                    <div id="info-view-<ano:write name="componentIndex"/>">
+                                                            <%-- ajax content --%>
+                                                    </div>
+                                                </div>
                                             </div>
                                             <%-- Thresholds & Accumulators tabs content end --%>
                                         </div>

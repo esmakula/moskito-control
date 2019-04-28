@@ -1,23 +1,16 @@
-import {
-  Component,
-  OnInit,
-  AfterViewInit,
-  ViewChildren,
-  QueryList,
-  ElementRef,
-  ChangeDetectorRef
-} from "@angular/core";
-import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
-import { UUID } from "angular2-uuid";
-import { Widget } from "app/widgets/widget.component";
-import { Chart } from "app/entities/chart";
-import { MoskitoAnalyzeChart } from "app/moskito-analyze/model/moskito-analyze-chart.model";
-import { MoskitoAnalyzeService } from "app/moskito-analyze/services/moskito-analyze.service";
-import { MoskitoApplicationService } from "app/services/moskito-application.service";
-import { MoskitoAnalyzeRestService } from "app/moskito-analyze/services/moskito-analyze-rest.service";
-import { ChartService } from "app/services/chart.service";
-import { MoskitoAnalyzeChartConfigurationModalComponent } from "app/moskito-analyze/widgets/moskito-analyze-chart/configuration-modal/ma-chart-configuration-modal.component";
-import { ChartPoint } from "app/entities/chart-point";
+import {AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnInit, QueryList, ViewChildren} from "@angular/core";
+import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
+import {UUID} from "angular2-uuid";
+import {Widget} from "app/widgets/widget.component";
+import {Chart} from "app/entities/chart";
+import {MoskitoAnalyzeChart} from "app/moskito-analyze/model/moskito-analyze-chart.model";
+import {MoskitoAnalyzeService} from "app/moskito-analyze/services/moskito-analyze.service";
+import {MoskitoApplicationService} from "app/services/moskito-application.service";
+import {MoskitoAnalyzeRestService} from "app/moskito-analyze/services/moskito-analyze-rest.service";
+import {ChartService} from "app/services/chart.service";
+import {MoskitoAnalyzeChartConfigurationModalComponent} from "app/moskito-analyze/widgets/moskito-analyze-chart/configuration-modal/ma-chart-configuration-modal.component";
+import {ChartPoint} from "app/entities/chart-point";
+import { MoskitoAnalyzeChartLine } from "../../model/moskito-analyze-chart-line.model";
 
 
 /**
@@ -242,11 +235,20 @@ export class MoskitoAnalyzeChartComponent extends Widget implements OnInit, Afte
         chart.caption = conf.caption;
         chart.name = conf.name;
         chart.interval = conf.interval;
-        chart.type = conf.type;
-        chart.hosts = conf.hosts;
-        chart.producer = conf.producer;
-        chart.stat = conf.stat;
-        chart.value = conf.value;
+        chart.lines = [];
+
+        conf.lines.forEach(line => {
+          const chartLine = new MoskitoAnalyzeChartLine();
+          chartLine.name = line.name;
+          chartLine.producer = line.producer;
+          chartLine.stat = line.stat;
+          chartLine.value = line.value;
+          chartLine.components = line.components;
+          chartLine.average = line.average;
+          chartLine.baseline = line.baseline;
+
+          chart.lines.push(chartLine);
+        });
 
         chart.startDate = new Date(conf.startDate);
         chart.endDate = new Date(conf.endDate);
@@ -273,20 +275,17 @@ export class MoskitoAnalyzeChartComponent extends Widget implements OnInit, Afte
 
   private retrieveChartData(chartConfig: MoskitoAnalyzeChart, afterLoad = () => { }) {
     chartConfig.loading = true;
-    this.moskitoAnalyzeRestService.getChartsDataForPeriod(chartConfig.type, this.moskitoAnalyzeRestService.buildChartRequest(chartConfig)).subscribe((data) => {
-      let chart = new Chart();
+    this.moskitoAnalyzeRestService.getChartsDataForPeriod(this.moskitoAnalyzeRestService.buildChartRequest(chartConfig)).subscribe((data) => {
+      const chart = new Chart();
       chart.name = chartConfig.caption;
 
       // Going through charts data response to get point values
       chart.points = [];
       chart.lineNames = [];
 
-      for (let chartData of data) {
-        let chartPoint = new ChartPoint();
-
-        let pointValues = [];
-        for (let value of chartData.values) {
-          for (let lineName in value) {
+      for (const chartData of data) {
+        for (const value of chartData.values) {
+          for (const lineName in value) {
             if (value.hasOwnProperty(lineName)) {
               // If no such line in array, add it
               if (chart.lineNames.indexOf(lineName) === -1) {
@@ -298,9 +297,22 @@ export class MoskitoAnalyzeChartComponent extends Widget implements OnInit, Afte
                   chart.lineNames.push(lineName);
                 }
               }
+            }
+          }
+        }
+      }
 
-              // Add value in position, where appropriate line name is stored
+      for (const chartData of data) {
+        const chartPoint = new ChartPoint();
+
+        const pointValues = [];
+        for (const value of chartData.values) {
+          for (const lineName of chart.lineNames) {
+            // Add value in position, where appropriate line name is stored
+            if (value[lineName]) {
               pointValues.splice(chart.lineNames.indexOf(lineName), 0, value[lineName]);
+            } else {
+              pointValues[chart.lineNames.indexOf(lineName)] = 0;
             }
           }
         }
@@ -312,13 +324,16 @@ export class MoskitoAnalyzeChartComponent extends Widget implements OnInit, Afte
       }
 
       // Finding chart config index in array as it is the same as in charts array
-      let id = this.chartsConfig.findIndex(
+      const id = this.chartsConfig.findIndex(
         (c: MoskitoAnalyzeChart) => c.id === chartConfig.id
       );
 
       // Replacing chart
-      if (id >= 0) this.charts[id] = chart;
-      else this.charts.push(chart);
+      if (id >= 0) {
+        this.charts[id] = chart;
+      } else {
+        this.charts.push(chart);
+      }
 
       this.isLoading = false;
       this.chartsDataLoaded = true;

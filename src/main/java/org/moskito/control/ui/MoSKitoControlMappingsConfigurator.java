@@ -10,6 +10,7 @@ import org.moskito.control.ui.action.configuration.ShowMoskitoControlConfigActio
 import org.moskito.control.ui.action.inspection.ShowAccumulatorsChartsAction;
 import org.moskito.control.ui.action.inspection.ShowAccumulatorsListAction;
 import org.moskito.control.ui.action.inspection.ShowConnectorInformationAction;
+import org.moskito.control.ui.action.inspection.ShowHistoryAction;
 import org.moskito.control.ui.action.inspection.ShowThresholdsAction;
 
 /**
@@ -51,7 +52,21 @@ public class MoSKitoControlMappingsConfigurator implements ActionMappingsConfigu
 				new CommandRedirect("redirect", "main", 302)
 		);
 
-        actionMappings.addMapping("muteNotifications", MuteNotificationsAction.class,
+		actionMappings.addMapping("addStatusFilter", AddStatusFilterAction.class,
+				new CommandRedirect("redirect", "main", 302)
+		);
+		actionMappings.addMapping("removeStatusFilter", RemoveStatusFilterAction.class,
+				new CommandRedirect("redirect", "main", 302)
+		);
+
+		actionMappings.addMapping("clearStatusFilter", ClearStatusFilterAction.class,
+				new CommandRedirect("redirect", "main", 302)
+		);
+		actionMappings.addMapping("clearCategoryFilter", ClearCategoryFilterAction.class,
+				new CommandRedirect("redirect", "main", 302)
+		);
+
+		actionMappings.addMapping("muteNotifications", MuteNotificationsAction.class,
                 new CommandRedirect("redirect", "main", 302)
         );
         actionMappings.addMapping("unmuteNotifications", UnmuteNotificationsAction.class,
@@ -72,6 +87,10 @@ public class MoSKitoControlMappingsConfigurator implements ActionMappingsConfigu
         );
 		actionMappings.addMapping("connectorInformation", ShowConnectorInformationAction.class,
 				new ActionForward("success", "/org/moskito/control/ui/jsp/inspection/ConnectorInformation.jsp"),
+				new ActionForward("error", "/org/moskito/control/ui/jsp/inspection/NoDataAvailable.jsp")
+		);
+		actionMappings.addMapping("componentHistory", ShowHistoryAction.class,
+				new ActionForward("success", "/org/moskito/control/ui/jsp/inspection/History.jsp"),
 				new ActionForward("error", "/org/moskito/control/ui/jsp/inspection/NoDataAvailable.jsp")
 		);
 
